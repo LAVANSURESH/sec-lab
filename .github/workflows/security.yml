@@ -3,19 +3,18 @@ on: [push, pull_request]
 
 jobs:
   sast-scan:
-    name: SAST (Semgrep)
     runs-on: ubuntu-latest
-    container:
-      image: semgrep/semgrep
     steps:
       - uses: actions/checkout@v4
       - name: Run Semgrep Scan
-        run: semgrep scan --config auto --json > sast-results.json
-      - name: Upload SAST Results
-        uses: actions/upload-artifact@v4
+        run: |
+          # Use --sarif to output the format GitHub understands
+          docker run --rm -v $(pwd):/src semgrep/semgrep semgrep scan --sarif --config auto > semgrep.sarif
+      
+      - name: Upload to GitHub Security Tab
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          name: sast-report
-          path: sast-results.json
+          sarif_file: semgrep.sarif
 
   iac-scan:
     name: IaC Scan (Checkov)
