@@ -1,6 +1,8 @@
 name: DevSecOps Lab Pipeline
 on: [push, pull_request]
-
+permissions:
+  contents: read      # Needed to checkout the code
+  security-events: write # Needed to upload SARIF results
 jobs:
   sast-scan:
     runs-on: ubuntu-latest
