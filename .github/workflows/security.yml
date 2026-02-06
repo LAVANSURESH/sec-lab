@@ -1,0 +1,49 @@
+name: DevSecOps Lab Pipeline
+on: [push, pull_request]
+
+jobs:
+  sast-scan:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep Scan
+        run: semgrep scan --config auto --json > sast-results.json
+      - name: Upload SAST Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-report
+          path: sast-results.json
+
+  iac-scan:
+    name: IaC Scan (Checkov)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkov Scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infra/
+          framework: terraform
+          output_format: cli,json
+          output_file_path: iac-results.json
+      - name: Upload IaC Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: iac-report
+          path: iac-results.json
+
+  dast-scan:
+    name: DAST (OWASP ZAP)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'https://www.google.com' # Replace with your test URL
+          rules_file_name: '.zap/rules.tsv'
+          fail_action: false # Don't break the build yet
