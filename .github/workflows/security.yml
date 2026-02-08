@@ -24,14 +24,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
+      - run: ls -la
+      - run: pwd
       - name: Run Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
         with:
           directory: infra/
           output_format: sarif
-          output_file_path: results
+          output_file_path: checkov.sarif
           # Soft fail allows the upload step to run even with failures
           soft_fail: true 
 
@@ -39,7 +40,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: results/results.sarif
+          sarif_file: checkov.sarif
           category: checkov-iac
 
   # dast-scan:
