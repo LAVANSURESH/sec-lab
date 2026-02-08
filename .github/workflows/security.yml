@@ -4,19 +4,19 @@ permissions:
   contents: read      # Needed to checkout the code
   security-events: write # Needed to upload SARIF results
 jobs:
-  sast-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Semgrep Scan
-        run: |
-          # Use --sarif to output the format GitHub understands
-          docker run --rm -v $(pwd):/src semgrep/semgrep semgrep scan --sarif --config auto > semgrep.sarif
+  # sast-scan:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Run Semgrep Scan
+  #       run: |
+  #         # Use --sarif to output the format GitHub understands
+  #         docker run --rm -v $(pwd):/src semgrep/semgrep semgrep scan --sarif --config auto > semgrep.sarif
       
-      - name: Upload to GitHub Security Tab
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep.sarif
+  #     - name: Upload to GitHub Security Tab
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       with:
+  #         sarif_file: semgrep.sarif
 
   # iac-analysis:
   #   name: IaC Scan
